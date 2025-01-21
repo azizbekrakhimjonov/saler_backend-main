@@ -50,3 +50,26 @@ import requests
 # response = requests.post(url, json=data)
 # print("Status code:", response.status_code)
 # print("Response data:", response.json())
+
+
+# product api testing
+# url = "http://127.0.0.1:8000/api/products/"
+# params = {'name': 'Soat'}
+#
+# try:
+#     response = requests.get(url, params=params)
+#     response_data = response.json()
+#
+#     if response.status_code == 200:
+#         print("Mahsulot topildi:")
+#         print(response_data)
+#     elif response.status_code == 400:
+#         print("Xatolik:", response_data.get('error', 'Noma’lum xatolik'))
+#     elif response.status_code == 404:
+#         print("Xatolik:", response_data.get('error', 'Mahsulot topilmadi'))
+#     else:
+#         print(f"Xatolik: {response.status_code} - {response_data}")
+# except requests.exceptions.RequestException as e:
+#     print(f"So'rov xatoligi yuz berdi: {e}")
+
+

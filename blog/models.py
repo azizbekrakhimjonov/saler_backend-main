@@ -49,7 +49,6 @@ class Category(models.Model):
         verbose_name = "Category"
         verbose_name_plural = "Categories"
 
-
 class Promocode(models.Model):
     code = models.CharField(max_length=6, unique=True, verbose_name="Promo Code")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name="Category")
@@ -67,7 +66,6 @@ class Promocode(models.Model):
     class Meta:
         verbose_name = "Promocode"
         verbose_name_plural = "Promocodes"
-
 
 # Signal qo‘shish: Yangi kategoriya yaratildimi yoki yangilanishi bo‘lsa, Promocode yaratish
 @receiver(post_save, sender=Category)
@@ -110,7 +108,7 @@ class User(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
-    image_url = models.URLField(max_length=200)  # URL for the product image
+    image = models.ImageField(upload_to='products/')  # Images will be uploaded to 'media/products/'
     points = models.IntegerField()  # Points required to purchase the product
 
     def __str__(self):

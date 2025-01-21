@@ -90,15 +90,21 @@ class ValidatePromocodeView(View):
             return JsonResponse({'error': 'Invalid JSON format.'}, status=400)
 
 
-class ProductListView(View):
-    def get(self, request, *args, **kwargs):
+class ProductListView(APIView):
+    def get(self, request):
+        product_name = request.GET.get('name')  # URL parametrlardan 'name' ni olish
+        if not product_name:
+            return Response({'error': 'Mahsulot nomini ko‘rsating'}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            products = Product.objects.all()  # Get all products
-            serializer = ProductSerializer(products, many=True)  # Serialize the products
-            return JsonResponse(serializer.data, safe=False, status=200)  # Return JSON response
+            # Mahsulotni nomi bilan qidirish
+            products = Product.objects.filter(name__iexact=product_name)  # nomni aniqlik bilan qidirish
+            if not products.exists():
+                return Response({'error': 'Bunday mahsulot topilmadi'}, status=status.HTTP_404_NOT_FOUND)
 
+            serializer = ProductSerializer(products, many=True)  # Serializatsiya qilish
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)  # Handle any unexpected errors
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  # Xatolikni qaytarish
 
 
 class BuyProductView(View):

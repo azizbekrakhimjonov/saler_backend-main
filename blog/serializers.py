@@ -17,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'name', 'image_url', 'price', 'points']
+        fields = ['id', 'name', 'image', 'points']
 
 class PhoneNumberSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=15)
