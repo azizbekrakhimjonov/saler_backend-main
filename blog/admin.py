@@ -8,19 +8,16 @@ from .models import User, Product, Purchase, FeedBack, PhoneNumber, Promocode, C
 def update_promocode_points(sender, instance, **kwargs):
     Promocode.objects.filter(category=instance).update(point=instance.point)
 
-
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'point')
     search_fields = ('name',)
-
 
 @admin.register(Promocode)
 class PromocodeAdmin(admin.ModelAdmin):
     list_display = ('code', 'category', 'point', 'used_by')
     search_fields = ('code', 'category__name', 'used_by')
     list_filter = ('category',)
-
 
 @admin.register(FeedBack)
 class FeedBackAdmin(admin.ModelAdmin):
@@ -33,10 +30,6 @@ class PhoneNumberAdmin(admin.ModelAdmin):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('id', 'telegram_id', 'fullname', 'phone_number', 'points')
-
-# @admin.register(Promocode)
-# class PromocodeAdmin(admin.ModelAdmin):
-#     list_display = ('id', 'code', 'category', 'point', 'used_by')
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
