@@ -4,18 +4,107 @@ from rest_framework import status
 from rest_framework.response import Response
 from .serializers import *
 from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 import json
 
 
-class FeedBackAPIView(APIView):
-    def post(self, request):
-        serializer = FeedBackSerializer(data=request.data)
-        print(serializer)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# class UsePromocodeAPIView(APIView):
+#     def post(self, request, *args, **kwargs):
+#         user_id = request.data.get("telegram_id")
+#         promo_code = request.data.get("promo_code")
+#
+#         # Foydalanuvchini topish
+#         user = get_object_or_404(User, telegram_id=user_id)
+#
+#         # Promokodni topish
+#         promocode = get_object_or_404(Promocode, code=promo_code)
+#
+#         if promocode.used_by is not None:
+#             return Response(
+#                 {
+#                     "success": False,
+#                     "message": f"Promo kod allaqachon ishlatilgan. "
+#                                f"Ishlatgan: {promocode.used_by.fullname}, {promocode.used_by.phone_number}"
+#                 },
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+#
+#         # Promokodni ishlatish
+#         promocode.used_by = user
+#         promocode.save()
+#
+#         # Foydalanuvchiga ball qo‘shish
+#         user.points += promocode.point
+#         user.save()
+#
+#         return Response(
+#             {
+#                 "success": True,
+#                 "message": "Promo kod muvaffaqiyatli ishlatildi!",
+#                 "data": {
+#                     "fullname": user.fullname,
+#                     "phone_number": user.phone_number,
+#                     "added_points": promocode.point,
+#                     "total_points": user.points,
+#                 }
+#             },
+#             status=status.HTTP_200_OK
+#         )
 
+class UsePromocodeAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        user_id = request.data.get("telegram_id")
+        promo_code = request.data.get("promo_code")
+
+        # Foydalanuvchini topish
+        user = get_object_or_404(User, telegram_id=user_id)
+
+        # Foydalanuvchi telefon raqamini tekshirish
+        phone_number = user.phone_number
+        if not PhoneNumber.objects.filter(phone=phone_number).exists():
+            return Response(
+                {
+                    "success": False,
+                    "message": "Sifatli mahsulotni...",
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Promokodni topish
+        promocode = get_object_or_404(Promocode, code=promo_code)
+
+        # Promokod ishlatilganligini tekshirish
+        if promocode.used_by is not None:
+            return Response(
+                {
+                    "success": False,
+                    "message": f"Promo kod allaqachon ishlatilgan. "
+                               f"Ishlatgan: {promocode.used_by.fullname}, {promocode.used_by.phone_number}"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Promokodni ishlatish
+        promocode.used_by = user
+        promocode.save()
+
+        # Foydalanuvchiga ball qo‘shish
+        user.points += promocode.point
+        user.save()
+
+        return Response(
+            {
+                "success": True,
+                "message": "Promo kod muvaffaqiyatli ishlatildi!",
+                "data": {
+                    "fullname": user.fullname,
+                    "phone_number": user.phone_number,
+                    "added_points": promocode.point,
+                    "total_points": user.points,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
 
 class CheckPhoneNumberAPIView(APIView):
     def post(self, request):
@@ -29,7 +118,6 @@ class CheckPhoneNumberAPIView(APIView):
                 return Response({"exists": False, "message": "Telefon raqami bazada mavjud emas."}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
 
 class UserRegistrationView(APIView):
     def post(self, request):
@@ -51,45 +139,6 @@ class UserRegistrationView(APIView):
             return Response({'message': 'Foydalanuvchi muvaffaqiyatli ro‘yxatdan o‘tdi.'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class ValidatePromocodeView(View):
-    def post(self, request):
-        try:
-            # Read JSON data
-            data = json.loads(request.body)
-            code = data.get('code')
-            telegram_id = data.get('telegram_id')
-
-            if not code or not telegram_id:
-                return JsonResponse({'error': 'Code and Telegram ID are required.'}, status=400)
-
-            user = User.objects.filter(telegram_id=telegram_id).first()
-            if not user:
-                return JsonResponse({'error': 'User not found.'}, status=404)
-
-            promocode = Promocode.objects.filter(code=code).first()
-            if not promocode:
-                return JsonResponse({'error': 'Invalid promocode.'}, status=404)
-
-            if promocode.used_by:
-                return JsonResponse({'error': f'{promocode.used_by}'}, status=203)
-
-            promocode.used_by = user.fullname  # Full name of the user
-            user.points += promocode.point
-            promocode.save()
-            user.save()
-
-            return JsonResponse({
-                'message': 'Promocode applied successfully.',
-                'category': promocode.category,
-                'added_points': promocode.point,
-                'total_points': user.points
-            }, status=200)
-
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON format.'}, status=400)
-
-
 class ProductListView(APIView):
     def get(self, request):
         product_name = request.GET.get('name')  # URL parametrlardan 'name' ni olish
@@ -105,7 +154,6 @@ class ProductListView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  # Xatolikni qaytarish
-
 
 class BuyProductView(View):
     def post(self, request):
@@ -153,3 +201,13 @@ class BuyProductView(View):
             return JsonResponse({"error": "Invalid JSON format."}, status=400)
         except Exception as e:
             return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
+
+class FeedBackAPIView(APIView):
+    def post(self, request):
+        serializer = FeedBackSerializer(data=request.data)
+        print(serializer)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
