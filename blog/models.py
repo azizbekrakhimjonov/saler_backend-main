@@ -1,9 +1,4 @@
-from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from random import choices
-from string import ascii_uppercase, digits
-
+import openpyxl
 import csv
 from random import choices
 import os
@@ -36,9 +31,23 @@ class PhoneNumber(models.Model):
     def __str__(self):
         return self.phone
 
+# class Category(models.Model):
+#     name = models.CharField(max_length=100, unique=True, verbose_name=_("Category"))
+#     point = models.IntegerField(verbose_name=_("Points"))
+#
+#     def __str__(self):
+#         return self.name
+#
+#     class Meta:
+#         verbose_name = _("Category")
+#         verbose_name_plural = _("Categories")
+
+from django.db import models
+
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name=_("Category"))
     point = models.IntegerField(verbose_name=_("Points"))
+    excel_file = models.FileField(upload_to='promocodes/', null=True, blank=True, verbose_name=_("Excel File"))
 
     def __str__(self):
         return self.name
@@ -46,6 +55,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")
+
 
 class Promocode(models.Model):
     code = models.CharField(max_length=6, unique=True, verbose_name=_("Promo Code"))
@@ -65,29 +75,69 @@ class Promocode(models.Model):
         verbose_name = _("Promocode")
         verbose_name_plural = _("Promocodes")
 
-# Signal qo‘shish: Yangi kategoriya yaratildimi yoki yangilanishi bo‘lsa, Promocode yaratish
+# @receiver(post_save, sender=Category)
+# def create_promocodes(sender, instance, created, **kwargs):
+#     if created:  # Yangi kategoriya qo'shilganda
+#         promocodes = []
+#         file_name = f"{instance.name}_promocodes.xlsx"
+#         file_path = os.path.join("media", "promocodes", file_name)
+#
+#         # Fayl saqlash uchun papka mavjudligini tekshirish
+#         os.makedirs(os.path.dirname(file_path), exist_ok=True)
+#
+#         # Excel fayl yaratish
+#         workbook = openpyxl.Workbook()
+#         sheet = workbook.active
+#         sheet.title = "Promocodes"
+#
+#         # Sarlavhalarni yozish
+#         sheet.append(["Promocode", "Category Name", "Points"])
+#
+#         for _ in range(1000):  # Har bir yangi kategoriya uchun 1000 ta Promocode generatsiya qilinadi
+#             code = ''.join(choices(ascii_uppercase + digits, k=6))  # Promo kod yaratish
+#             promocodes.append(
+#                 Promocode(code=code, category=instance, point=instance.point)
+#             )
+#             sheet.append([code, instance.name, instance.point])  # Excelga yozish
+#
+#         Promocode.objects.bulk_create(promocodes)  # Promocodlarni saqlash
+#         workbook.save(file_path)  # Excel faylni saqlash
+#
+#         # Fayl yo'lini modelga saqlash
+#         instance.excel_file = file_path
+#         instance.save()
+
 @receiver(post_save, sender=Category)
 def create_promocodes(sender, instance, created, **kwargs):
     if created:  # Yangi kategoriya qo‘shilganda
         promocodes = []
-        file_name = f"{instance.name}_promocodes.csv"
+        file_name = f"{instance.name}_promocodes.xlsx"
         file_path = os.path.join("media", "promocodes", file_name)
 
         # Fayl saqlash uchun papka mavjudligini tekshirish
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-        with open(file_path, mode="w", newline="", encoding="utf-8") as csv_file:
-            writer = csv.writer(csv_file)
-            writer.writerow(["Promocode", "Category Name", "Points"])  # Sarlavhalar yozish
+        # Excel fayl yaratish
+        workbook = openpyxl.Workbook()
+        sheet = workbook.active
+        sheet.title = "Promocodes"
 
-            for _ in range(100):  # Har bir yangi kategoriya uchun 100 ta Promocode generatsiya qilinadi
-                code = ''.join(choices(ascii_uppercase + digits, k=6))  # Promo kod yaratish
-                promocodes.append(
-                    Promocode(code=code, category=instance, point=instance.point)
-                )
-                writer.writerow([code, instance.name, instance.point])  # CSV faylga yozish
+        # Sarlavhalarni yozish
+        sheet.append(["Promocode", "Category Name", "Points"])
 
-        Promocode.objects.bulk_create(promocodes)  # Barcha Promocode'larni bazaga saqlash
+        for _ in range(1000):  # Har bir yangi kategoriya uchun 1000 ta Promocode generatsiya qilinadi
+            code = ''.join(choices(ascii_uppercase + digits, k=6))  # Promo kod yaratish
+            promocodes.append(
+                Promocode(code=code, category=instance, point=instance.point)
+            )
+            sheet.append([code, instance.name, instance.point])  # Excelga yozish
+
+        Promocode.objects.bulk_create(promocodes)  # Promocodlarni saqlash
+        workbook.save(file_path)  # Excel faylni saqlash
+
+        # Excel faylni modelga bog‘lash
+        instance.excel_file = f'promocodes/{file_name}'
+        instance.save()
 
 
 class FeedBack(models.Model):

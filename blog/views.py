@@ -7,50 +7,6 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 import json
 
-
-# class UsePromocodeAPIView(APIView):
-#     def post(self, request, *args, **kwargs):
-#         user_id = request.data.get("telegram_id")
-#         promo_code = request.data.get("promo_code")
-#
-#         # Foydalanuvchini topish
-#         user = get_object_or_404(User, telegram_id=user_id)
-#
-#         # Promokodni topish
-#         promocode = get_object_or_404(Promocode, code=promo_code)
-#
-#         if promocode.used_by is not None:
-#             return Response(
-#                 {
-#                     "success": False,
-#                     "message": f"Promo kod allaqachon ishlatilgan. "
-#                                f"Ishlatgan: {promocode.used_by.fullname}, {promocode.used_by.phone_number}"
-#                 },
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-#
-#         # Promokodni ishlatish
-#         promocode.used_by = user
-#         promocode.save()
-#
-#         # Foydalanuvchiga ball qo‘shish
-#         user.points += promocode.point
-#         user.save()
-#
-#         return Response(
-#             {
-#                 "success": True,
-#                 "message": "Promo kod muvaffaqiyatli ishlatildi!",
-#                 "data": {
-#                     "fullname": user.fullname,
-#                     "phone_number": user.phone_number,
-#                     "added_points": promocode.point,
-#                     "total_points": user.points,
-#                 }
-#             },
-#             status=status.HTTP_200_OK
-#         )
-
 class UsePromocodeAPIView(APIView):
     def post(self, request, *args, **kwargs):
         user_id = request.data.get("telegram_id")

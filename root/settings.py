@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-6il9nezx&%iax7y=8o!8g2grgrkkn*isx$1z7htvi_=mj%2v6p
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost',  '.ngrok-free.app']
-CSRF_TRUSTED_ORIGINS = ['https://b2e7-188-113-228-231.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://5f24-188-113-254-193.ngrok-free.app']
 
 JAZZMIN_UI_TWEAKS = {
     "theme": "flatly",
@@ -127,12 +127,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
-
 import os
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

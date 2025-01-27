@@ -2,11 +2,11 @@ import requests
 
 # promocode api testing
 # data = {
-#     'telegram_id': '112233',
-#     'promo_code': 'LSJZ0W',
+#     'telegram_id': '1486580350',
+#     'promo_code': 'IEG2ZP',
 # }
 # #
-# res = requests.post('http://127.0.0.1:8000/api/code/', json=data)
+# res = requests.post('https://5f24-188-113-254-193.ngrok-free.app/api/code/', json=data)
 # print(res.status_code)
 # print(res.text)
 
@@ -15,7 +15,7 @@ import requests
 #     'user': 'Nora Tomson',
 #     'message': 'I like it'
 # }
-# res = requests.post('http://127.0.0.1:8000/api/feedback/', json=data)
+# res = requests.post('https://5f24-188-113-254-193.ngrok-free.app/api/feedback/', json=data)
 # # print(res.text)
 # print(res.status_code)
 
@@ -31,17 +31,17 @@ import requests
 
 
 # register api testing
-url = 'http://127.0.0.1:8000/api/register/'
-
-data = {
-        "telegram_id": "112233",
-        "fullname": "Nora",
-        "phone_number": "+998909001122",
-        "address": "Toshkent, Yunusobod"
-    }
-response = requests.post(url, json=data)
-print("Status code:", response.status_code)
-print("Response data:", response.json())
+# url = 'http://127.0.0.1:8000/api/register/'
+#
+# data = {
+#         "telegram_id": "112233",
+#         "fullname": "Nora",
+#         "phone_number": "+998909001122",
+#         "address": "Toshkent, Yunusobod"
+#     }
+# response = requests.post(url, json=data)
+# print("Status code:", response.status_code)
+# print("Response data:", response.json())
 
 
 # product api testing
