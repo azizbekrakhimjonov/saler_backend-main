@@ -13,6 +13,8 @@ def update_promocode_points(sender, instance, **kwargs):
 @admin.register(Promocode)
 class PromocodeAdmin(admin.ModelAdmin):
     list_display = ('code', 'category', 'point', 'used_by')
+    list_filter = ('category',)
+    search_fields = ('code', )
     actions = ['export_to_excel']
 
     def export_to_excel(self, request, queryset):
@@ -67,5 +69,9 @@ class PhoneNumberAdmin(admin.ModelAdmin):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('id', 'telegram_id', 'fullname', 'phone_number', 'points')
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'points')
 
 admin.site.register(Purchase)

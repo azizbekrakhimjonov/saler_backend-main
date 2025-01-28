@@ -75,44 +75,13 @@ class Promocode(models.Model):
         verbose_name = _("Promocode")
         verbose_name_plural = _("Promocodes")
 
-# @receiver(post_save, sender=Category)
-# def create_promocodes(sender, instance, created, **kwargs):
-#     if created:  # Yangi kategoriya qo'shilganda
-#         promocodes = []
-#         file_name = f"{instance.name}_promocodes.xlsx"
-#         file_path = os.path.join("media", "promocodes", file_name)
-#
-#         # Fayl saqlash uchun papka mavjudligini tekshirish
-#         os.makedirs(os.path.dirname(file_path), exist_ok=True)
-#
-#         # Excel fayl yaratish
-#         workbook = openpyxl.Workbook()
-#         sheet = workbook.active
-#         sheet.title = "Promocodes"
-#
-#         # Sarlavhalarni yozish
-#         sheet.append(["Promocode", "Category Name", "Points"])
-#
-#         for _ in range(1000):  # Har bir yangi kategoriya uchun 1000 ta Promocode generatsiya qilinadi
-#             code = ''.join(choices(ascii_uppercase + digits, k=6))  # Promo kod yaratish
-#             promocodes.append(
-#                 Promocode(code=code, category=instance, point=instance.point)
-#             )
-#             sheet.append([code, instance.name, instance.point])  # Excelga yozish
-#
-#         Promocode.objects.bulk_create(promocodes)  # Promocodlarni saqlash
-#         workbook.save(file_path)  # Excel faylni saqlash
-#
-#         # Fayl yo'lini modelga saqlash
-#         instance.excel_file = file_path
-#         instance.save()
-
 @receiver(post_save, sender=Category)
 def create_promocodes(sender, instance, created, **kwargs):
     if created:  # Yangi kategoriya qo‘shilganda
         promocodes = []
         file_name = f"{instance.name}_promocodes.xlsx"
         file_path = os.path.join("media", "promocodes", file_name)
+        # file_path = os.path.join("/var/www/softools.uz/media", "promocodes", file_name)
 
         # Fayl saqlash uchun papka mavjudligini tekshirish
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
