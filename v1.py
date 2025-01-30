@@ -1,7 +1,7 @@
 from aiogram import Bot, Dispatcher, executor, types
 import aiohttp
 
-url = 'https://4119-188-113-228-231.ngrok-free.app'
+url = 'https://softools.uz/'
 # API endpoints
 API_URL_REGISTER = f"{url}/api/register/"
 API_URL_PROMOCODE = f"{url}/api/code/"

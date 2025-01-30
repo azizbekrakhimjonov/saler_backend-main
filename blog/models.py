@@ -31,19 +31,6 @@ class PhoneNumber(models.Model):
     def __str__(self):
         return self.phone
 
-# class Category(models.Model):
-#     name = models.CharField(max_length=100, unique=True, verbose_name=_("Category"))
-#     point = models.IntegerField(verbose_name=_("Points"))
-#
-#     def __str__(self):
-#         return self.name
-#
-#     class Meta:
-#         verbose_name = _("Category")
-#         verbose_name_plural = _("Categories")
-
-from django.db import models
-
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name=_("Category"))
     point = models.IntegerField(verbose_name=_("Points"))

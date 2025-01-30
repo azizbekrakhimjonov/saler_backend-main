@@ -3,10 +3,10 @@ import requests
 # promocode api testing
 # data = {
 #     'telegram_id': '1486580350',
-#     'promo_code': 'IEG2ZP',
+#     'promo_code': 'DSV5Q7',
 # }
 # #
-# res = requests.post('https://5f24-188-113-254-193.ngrok-free.app/api/code/', json=data)
+# res = requests.post('https://softools.uz/api/code/', json=data)
 # print(res.status_code)
 # print(res.text)
 
@@ -22,34 +22,34 @@ import requests
 
 # phone api testing
 # data = {
-#     # 'phone': '+998932608005',  # bazada mavjud bolgan raqam
-#     'phone': '+998909001122',  # bazada mavjud bolmagan raqam
+#     'phone': '+998932608005',  # bazada mavjud bolgan raqam
+#     # 'phone': '+998909001122',  # bazada mavjud bolmagan raqam
 # }
-# res = requests.post('http://127.0.0.1:8000/api/phone/', json=data)
+# res = requests.post('https://softools.uz/api/phone/', json=data)
 # print(res.status_code)
 # print(res.json().get('exists'))
 
 
 # register api testing
-url = 'https://softools.uz/api/register/'
-
-data = {
-        "telegram_id": "112233",
-        "fullname": "Nora",
-        "phone_number": "+998909001122",
-        "address": "Toshkent, Yunusobod"
-    }
-response = requests.post(url, json=data)
-print("Status code:", response.status_code)
-print("Response data:", response.json())
+# url = 'https://softools.uz/api/register/'
+#
+# data = {
+#         "telegram_id": "1486580350",
+#         "fullname": "Azizbek Rahimjonov",
+#         "phone_number": "+998932608005",
+#         "address": "Toshkent, Yunusobod"
+#     }
+# response = requests.post(url, json=data)
+# print("Status code:", response.status_code)
+# print("Response data:", response.json())
 
 
 # product api testing
-# url = "http://127.0.0.1:8000/api/products/"
+# url = "http://softools.uz/api/products/"
 # params = {'name': 'Soat'}
 #
 # try:
-#     response = requests.get(url, params=params)
+#     response = requests.get(url)
 #     response_data = response.json()
 #
 #     if response.status_code == 200:
