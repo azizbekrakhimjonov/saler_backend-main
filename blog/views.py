@@ -97,14 +97,16 @@ class UserRegistrationView(APIView):
 
 class ProductListView(APIView):
     def get(self, request):
-        product_name = request.GET.get('name')  # URL parametrlardan 'name' ni olish
-        if not product_name:
-            return Response({'error': 'Mahsulot nomini ko‘rsating'}, status=status.HTTP_400_BAD_REQUEST)
+        product_name = request.GET.get('name')  # URL parametrlardan 'name' ni olish (ixtiyoriy)
         try:
-            # Mahsulotni nomi bilan qidirish
-            products = Product.objects.filter(name__iexact=product_name)  # nomni aniqlik bilan qidirish
-            if not products.exists():
-                return Response({'error': 'Bunday mahsulot topilmadi'}, status=status.HTTP_404_NOT_FOUND)
+            if product_name:
+                # Agar mahsulot nomi berilgan bo‘lsa, shu nom bo‘yicha qidirish
+                products = Product.objects.filter(name__iexact=product_name)  # nomni aniqlik bilan qidirish
+                if not products.exists():
+                    return Response({'error': 'Bunday mahsulot topilmadi'}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                # Aks holda barcha mahsulotlarni olish
+                products = Product.objects.all()
 
             serializer = ProductSerializer(products, many=True)  # Serializatsiya qilish
             return Response(serializer.data, status=status.HTTP_200_OK)
