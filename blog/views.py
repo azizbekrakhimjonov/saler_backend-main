@@ -75,6 +75,22 @@ class CheckPhoneNumberAPIView(APIView):
         else:
             return Response({"errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
+class CheckTelegramIDView(APIView):
+    def post(self, request):
+        telegram_id = request.data.get('telegram_id')
+        if not telegram_id:
+            return Response({'error': 'telegram_id maydoni kiritilmagan.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(telegram_id=telegram_id)
+            return Response({
+                'exists': True,
+                'is_registered': user.is_registered,
+                'points': user.points
+            }, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'exists': False}, status=status.HTTP_200_OK)
+
 class UserRegistrationView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
