@@ -23,7 +23,7 @@ class UsePromocodeAPIView(APIView):
             return Response(
                 {
                     "success": False,
-                    "message": f"Promo kod allaqachon ishlatilgan. "
+                    "message": f"Promo kod allaqachon ishlatilgan.\n"
                                f"Ishlatgan: {promocode.used_by.fullname}, {promocode.used_by.phone_number}"
                 },
                 status=status.HTTP_400_BAD_REQUEST
@@ -75,6 +75,7 @@ class CheckTelegramIDView(APIView):
             return Response({
                 'exists': True,
                 'is_registered': user.is_registered,
+                'phone_number': user.phone_number,
                 'points': user.points
             }, status=status.HTTP_200_OK)
         except User.DoesNotExist:
