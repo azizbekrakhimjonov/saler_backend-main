@@ -80,21 +80,32 @@ class UserRegistrationView(APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
-            user, created = User.objects.get_or_create(
-                telegram_id=data['telegram_id'],
-                defaults={
-                    'fullname': data['fullname'],
-                    'phone_number': data['phone_number'],
-                    'address': data['address'],
-                    'is_registered': True,
-                    'points': 5
-                }
-            )
-            if not created and user.is_registered:
-                return Response({'message': 'Foydalanuvchi allaqachon ro‘yxatdan o‘tgan.'}, status=status.HTTP_200_OK)
-            return Response({'message': 'Foydalanuvchi muvaffaqiyatli ro‘yxatdan o‘tdi.'}, status=status.HTTP_201_CREATED)
+            try:
+                # Faqat telegram_id bo'yicha foydalanuvchini topish
+                user = User.objects.get(telegram_id=data['telegram_id'])
+                if user.is_registered:
+                    return Response({'message': 'Foydalanuvchi allaqachon ro‘yxatdan o‘tgan.'}, status=status.HTTP_200_OK)
+                else:
+                    # Agar foydalanuvchi ro'yxatdan o'tmagan bo'lsa, uni yangilash
+                    user.fullname = data.get('fullname', user.fullname)  # Agar maydon yuborilmasa, eski qiymat saqlanadi
+                    user.phone_number = data.get('phone_number', user.phone_number)
+                    user.address = data.get('address', user.address)
+                    user.is_registered = True
+                    user.points = 5
+                    user.save()
+                    return Response({'message': 'Foydalanuvchi muvaffaqiyatli ro‘yxatdan o‘tdi.'}, status=status.HTTP_201_CREATED)
+            except User.DoesNotExist:
+                # Agar foydalanuvchi topilmasa, yangi foydalanuvchi yaratish
+                User.objects.create(
+                    telegram_id=data['telegram_id'],
+                    fullname=data.get('fullname', ''),  # Agar maydon yuborilmasa, bo'sh qator saqlanadi
+                    phone_number=data.get('phone_number', ''),
+                    address=data.get('address', ''),
+                    is_registered=True,
+                    points=5
+                )
+                return Response({'message': 'Foydalanuvchi muvaffaqiyatli ro‘yxatdan o‘tdi.'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class ProductListView(APIView):
     def get(self, request):
         product_name = request.GET.get('name')  # URL parametrlardan 'name' ni olish (ixtiyoriy)

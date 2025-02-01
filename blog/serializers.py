@@ -6,7 +6,12 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['telegram_id', 'fullname', 'phone_number', 'address']
-
+        extra_kwargs = {
+            'fullname': {'required': False},
+            'phone_number': {'required': False},
+            'address': {'required': False},
+            'telegram_id': {'validators': []},  # Unique tekshiruvini o'chirish
+        }
     def validate_phone_number(self, value):
         if not value.startswith('+') or not value[1:].isdigit():
             raise serializers.ValidationError("Telefon raqam xalqaro formatda bo'lishi kerak. Masalan, +998901234567.")
