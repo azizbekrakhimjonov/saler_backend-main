@@ -15,17 +15,6 @@ class UsePromocodeAPIView(APIView):
         # Foydalanuvchini topish
         user = get_object_or_404(User, telegram_id=user_id)
 
-        # Foydalanuvchi telefon raqamini tekshirish
-        phone_number = user.phone_number
-        if not PhoneNumber.objects.filter(phone=phone_number).exists():
-            return Response(
-                {
-                    "success": False,
-                    "message": "Sifatli mahsulotni...",
-                },
-                status=status.HTTP_304_NOT_MODIFIED
-            )
-
         # Promokodni topish
         promocode = get_object_or_404(Promocode, code=promo_code)
 
@@ -122,6 +111,7 @@ class UserRegistrationView(APIView):
                 )
                 return Response({'message': 'Foydalanuvchi muvaffaqiyatli ro‘yxatdan o‘tdi.'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class ProductListView(APIView):
     def get(self, request):
         product_name = request.GET.get('name')  # URL parametrlardan 'name' ni olish (ixtiyoriy)
