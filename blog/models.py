@@ -67,8 +67,7 @@ def create_promocodes(sender, instance, created, **kwargs):
     if created:  # Yangi kategoriya qo‘shilganda
         promocodes = []
         file_name = f"{instance.name}_promocodes.xlsx"
-        file_path = os.path.join("media", "promocodes", file_name)
-        # file_path = os.path.join("/var/www/softools.uz/media", "promocodes", file_name)
+        file_path = os.path.join("/var/www/softools.uz/media", "promocodes", file_name)
 
         # Fayl saqlash uchun papka mavjudligini tekshirish
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
@@ -94,7 +93,6 @@ def create_promocodes(sender, instance, created, **kwargs):
         # Excel faylni modelga bog‘lash
         instance.excel_file = f'promocodes/{file_name}'
         instance.save()
-
 
 class FeedBack(models.Model):
     user = models.CharField(max_length=100)
