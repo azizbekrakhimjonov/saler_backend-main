@@ -12,6 +12,7 @@ urlpatterns = [
     path('feedback/', FeedBackAPIView.as_view(), name='user_feedback'),
     path('products/', ProductListView.as_view(), name='product-list'),
     path('check_id/', CheckTelegramIDView.as_view(), name='check_telegram_id'),
+    path('check_code/', CheckPromocodeAPIView.as_view(), name='check_code'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

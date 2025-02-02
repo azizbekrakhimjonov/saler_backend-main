@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 import json
 
+
 class UsePromocodeAPIView(APIView):
     def post(self, request, *args, **kwargs):
         user_id = request.data.get("telegram_id")
@@ -80,6 +81,16 @@ class CheckTelegramIDView(APIView):
             }, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'exists': False}, status=status.HTTP_200_OK)
+
+class CheckPromocodeAPIView(APIView):
+    def post(self, request):
+        promo_code = request.data.get("promo_code")
+        promocode = Promocode.objects.filter(code=promo_code).first()
+
+        if not promocode:
+            return Response({"exists": False, "message": "Promokod topilmadi."}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({"exists": True, "message": "Promokod mavjud."}, status=status.HTTP_200_OK)
 
 class UserRegistrationView(APIView):
     def post(self, request):
