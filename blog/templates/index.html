@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HIPAD.</title>
+    <style>
+        /* Umumiy stil */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;  /* Fon rangi */
+            font-family: Arial, sans-serif;  /* Shrift turi */
+        }
+
+        /* HIPAD. yozuvi uchun stil */
+        .hipad-text {
+            font-size: 5rem;  /* Yozuv hajmi */
+            font-weight: bold;  /* Qalin yozuv */
+            color: #333;  /* Yozuv rangi */
+            text-transform: uppercase;  /* Barcha harflarni katta qilish */
+            letter-spacing: 10px;  /* Harflar orasidagi masofa */
+            animation: glow 2s infinite alternate;  /* Animatsiya */
+        }
+
+        /* Yozuvga animatsiya qo'shish */
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #ff7f50, 0 0 20px #ff7f50, 0 0 30px #ff7f50;
+            }
+            to {
+                text-shadow: 0 0 20px #ff4500, 0 0 30px #ff4500, 0 0 40px #ff4500;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hipad-text">HIPAD.</div>
+</body>
+</html>
