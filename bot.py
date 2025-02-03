@@ -1,3 +1,4 @@
+  GNU nano 6.2                                                                                                                                                                                                                                                                                                                                                          hipad_back/bot.py *                                                                                                                                                                                                                                                                                                                                                                  
 from aiogram import Bot, Dispatcher, executor, types
 import logging
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -5,7 +6,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 import requests
 
-url = ''
+url = 'https://hipad.uz'
 # url = 'https://9640-188-113-231-246.ngrok-free.app'
 API_URL_CHECK_ID =  f"{url}/api/check_id/"
 API_URL_CHECK_PHONE =  f"{url}/api/phone/"
@@ -15,7 +16,8 @@ API_URL_REGISTER =  f"{url}/api/register/"
 API_URL_PROMOCODE = f"{url}/api/code/"
 API_URL_PRODUCTS =  f"{url}/api/products/"
 API_URL_BUY_PRODUCTS = f"{url}/api/buy_product/"
-TOKEN = "7832802417:AAHd6atjmzCKdx4IgnOJLB7EIsvUrP9Mu7U"
+TOKEN = "7451986125:AAEykGVq6ZNjnUaUZLc8TTof-TN8P8y77K4"
+# TOKEN = "7832802417:AAHd6atjmzCKdx4IgnOJLB7EIsvUrP9Mu7U"
 
 logging.basicConfig(level=logging.INFO)
 
@@ -44,7 +46,7 @@ async def start(message: types.Message):
         if data['exists']:
             if data['is_registered']:
                 await message.answer(
-                    f"Assalomu alaykum! Siz avval ro'yxatdan o'tgansiz ✅\n📊Umumiy ballaringiz: {data['points']}"
+                    f"Assalomu alaykum! Siz avval ro'yxatdan o'tgansiz ✅\n📊Umumiy bonus ballar: {data['points']}"
                 )
                 markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
                 promocode_button = types.KeyboardButton("Promokod yuborish")
@@ -53,19 +55,19 @@ async def start(message: types.Message):
                 res = requests.post(API_URL_CHECK_PHONE, json={'phone': data['phone_number']})
                 if res.status_code == 200:
                     markup.add(promocode_button, products_button, feedback_button)
-                    await message.answer("Iltimos, kerakli tugmani tanlang.", reply_markup=markup)
+                    await message.answer("Iltimos, kerakli tugmani tanlang:", reply_markup=markup)
                 else:
                     markup.add(promocode_button)
-                    await message.answer("Iltimos, kerakli tugmani tanlang.", reply_markup=markup)
+                    await message.answer("Iltimos, kerakli tugmani tanlang:", reply_markup=markup)
 
             else:
-                await message.answer("Siz ro'yxatdan o'tmagansiz. Iltimos, to'liq ismingizni kiriting.")
+                await message.answer("Siz ro'yxatdan o'tmagansiz. Iltimos, to'liq ismingizni kiriting:")
                 await RegistrationStates.fullname.set()
         else:
-            await message.answer("Assalomu alaykum! To'liq ismingizni kiriting.")
+            await message.answer("Assalomu alaykum! To'liq ismingizni kiriting:")
             await RegistrationStates.fullname.set()
     else:
-        await message.answer("Xatolik yuz berdi. Iltimos, qayta urinib ko'ring.")
+        await message.answer("Xatolik yuz berdi. Iltimos, qayta urinib ko'ring. \n\t\t/start")
 
 @dp.message_handler(state=RegistrationStates.fullname)
 async def get_fullname(message: types.Message, state: FSMContext):
@@ -131,20 +133,20 @@ async def check_promocode(message: types.Message, state: FSMContext):
                 if response.status_code == 200:
                     data = response.json()['data']
                     await message.answer(
-                        f"Promokod muvaffaqiyatli qo'llandi:\nQo'shilgan ballar: {data.get('added_points')}\nUmumiy ballar: {data.get('total_points')}")
+                        f"✅Promokod muvaffaqiyatli qo'llanildi:\nBonus ball: {data.get('added_points')}\nUmumiy bonus ballar: {data.get('total_points')}")
                 elif response.status_code == 400:
                     await message.answer(f"{response.json()['message']}")
                 else:
-                    await message.answer(f"Noto`gri promocode")
+                    await message.answer(f"Siz noto`gri promokod kiritingiz")
             elif requests.post(API_URL_CHECK_CODE, json={'promo_code': promocode}).status_code == 404:
-                await message.answer("Notogri Promocode")
+                await message.answer("Siz noto`gri promokod kiritingiz")
             else:
-                await message.answer("Sifatli Mahsulot ✅")
+                await message.answer("✅Siz siftali maxsulot xarid qildingiz")
     await state.finish()
 
 @dp.message_handler(lambda message: message.text == "Izoh")
 async def feedback(message: types.Message):
-    await message.answer("Izoh yozish uchun matn yuboring.")
+    await message.answer("Izoh yozish uchun matn yuboring:")
     await FeedbackStates.feedback.set()
 
 @dp.message_handler(state=FeedbackStates.feedback)
@@ -160,7 +162,7 @@ async def process_feedback(message: types.Message, state: FSMContext):
             "message": feedback_text
         }
         response = requests.post(API_URL_FEEDBACK, json=payload)
-
+        # await message.answer(f'{check_response.status_code}')
         if response.status_code == 201:
             await message.answer("Izohingiz uchun rahmat!")
         else:
@@ -193,7 +195,6 @@ async def show_products(message: types.Message):
                         await bot.send_photo(message.chat.id, image_url, reply_markup=markup)
                 else:
                     await message.answer("Mahsulotlar mavjud emas.")
-
 @dp.callback_query_handler(lambda call: call.data.startswith('buy_'))
 async def buy_product(call: types.CallbackQuery):
     product_id = call.data.split('_')[1]
@@ -228,14 +229,11 @@ async def echo(message: types.Message):
                   res = requests.post(API_URL_CHECK_PHONE, json={'phone': data['phone_number']})
                   if res.status_code == 200:
                       markup.add(promocode_button, products_button, feedback_button)
-                      await message.answer("Iltimos, kerakli tugmani tanlang.", reply_markup=markup)
+                      await message.answer("Iltimos, kerakli tugmani tanlang:", reply_markup=markup)
                   else:
                       markup.add(promocode_button)
-                      await message.answer("Iltimos, kerakli tugmani tanlang.", reply_markup=markup)
+                      await message.answer("Iltimos, kerakli tugmani tanlang:", reply_markup=markup)
 
 
 if __name__ == "__main__":
     executor.start_polling(dp, skip_updates=False)
-
-
-
