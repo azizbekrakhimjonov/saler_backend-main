@@ -1,4 +1,3 @@
-                                                                                                                                                                                                                                                                                                                                                       hipad_back/bot.py *                                                                                                                                                                                                                                                                                                                                                                  
 from aiogram import Bot, Dispatcher, executor, types
 import logging
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -16,7 +15,7 @@ API_URL_REGISTER =  f"{url}/api/register/"
 API_URL_PROMOCODE = f"{url}/api/code/"
 API_URL_PRODUCTS =  f"{url}/api/products/"
 API_URL_BUY_PRODUCTS = f"{url}/api/buy_product/"
-TOKEN = "7451986125:AAEykGVq6ZNjnUaUZLc8TTof-TN8P8y77K4"
+
 # TOKEN = "7832802417:AAHd6atjmzCKdx4IgnOJLB7EIsvUrP9Mu7U"
 
 logging.basicConfig(level=logging.INFO)
