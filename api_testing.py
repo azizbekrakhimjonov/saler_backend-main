@@ -53,14 +53,14 @@ import requests
 # check_id api
 
 # url = 'http://127.0.0.1:8000/api/check_id/'
-# # url = 'http://hipad.uz/api/check_id/'
-# data = {
-#     "telegram_id": "1486580350"
-# }
-#
-# response = requests.post(url, json=data)
-# print("Status code:", response.status_code)
-# print("Response data:", response.json())
+url = 'https://hipad.uz/api/check_id/'
+data = {
+    "telegram_id": "1486580350",
+}
+
+response = requests.post(url, json=data)
+print("Status code:", response.status_code)
+print("Response data:", response.json())
 
 # product api testing
 # url = " https://021c-84-54-83-43.ngrok-free.app/api/products/"

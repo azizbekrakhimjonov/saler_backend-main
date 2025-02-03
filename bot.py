@@ -10,6 +10,7 @@ url = 'https://hipad.uz'
 API_URL_CHECK_ID =  f"{url}/api/check_id/"
 API_URL_CHECK_PHONE =  f"{url}/api/phone/"
 API_URL_CHECK_CODE =  f"{url}/api/check_code/"
+API_URL_FEEDBACK =  f"{url}/api/feedback/"
 API_URL_REGISTER =  f"{url}/api/register/"
 API_URL_PROMOCODE = f"{url}/api/code/"
 API_URL_PRODUCTS =  f"{url}/api/products/"
@@ -27,6 +28,13 @@ class RegistrationStates(StatesGroup):
     fullname = State()
     phone_number = State()
     address = State()
+
+class FeedbackStates(StatesGroup):
+    feedback = State()
+
+class PromocodeStates(StatesGroup):
+    waiting_for_promocode = State()
+
 
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
@@ -100,9 +108,66 @@ async def get_address(message: types.Message, state: FSMContext):
 
     await state.finish()
 
+
 @dp.message_handler(lambda message: message.text == "Promokod yuborish")
 async def promocode_start(message: types.Message):
-    await message.answer("Promokodingizni kiriting.")
+    await message.answer("Promokodni kiriting.")
+    await PromocodeStates.waiting_for_promocode.set()
+
+@dp.message_handler(state=PromocodeStates.waiting_for_promocode)
+async def check_promocode(message: types.Message, state: FSMContext):
+    telegram_id = str(message.from_user.id)
+    promocode = message.text
+    payload = {
+        "telegram_id": telegram_id,
+        "promo_code": promocode
+    }
+    check_response = requests.post(API_URL_CHECK_ID, json={"telegram_id": telegram_id})
+    if check_response.status_code == 200:
+        data = check_response.json()
+        if data['exists']:
+            res = requests.post(API_URL_CHECK_PHONE, json={'phone': data['phone_number']})
+            if res.status_code == 200:
+                response = requests.post(API_URL_PROMOCODE, json=payload)
+                if response.status_code == 200:
+                    data = response.json()['data']
+                    await message.answer(
+                        f"Promokod muvaffaqiyatli qo'llandi:\nQo'shilgan ballar: {data.get('added_points')}\nUmumiy ballar: {data.get('total_points')}")
+                elif response.status_code == 400:
+                    await message.answer(f"{response.json()['message']}")
+                else:
+                    await message.answer(f"Noto`gri promocode")
+            elif requests.post(API_URL_CHECK_CODE, json={'promo_code': promocode}).status_code == 404:
+                await message.answer("Notogri Promocode")
+            else:
+                await message.answer("Sifatli Mahsulot ✅")
+    await state.finish()
+
+@dp.message_handler(lambda message: message.text == "Izoh")
+async def feedback(message: types.Message):
+    await message.answer("Izoh yozish uchun matn yuboring.")
+    await FeedbackStates.feedback.set()
+
+@dp.message_handler(state=FeedbackStates.feedback)
+async def process_feedback(message: types.Message, state: FSMContext):
+    feedback_text = message.text
+    telegram_id = str(message.from_user.id)
+    print(feedback_text)
+    check_response = requests.post(API_URL_CHECK_ID, json={"telegram_id": telegram_id})
+    if check_response.status_code == 200:
+        data = check_response.json()
+        payload = {
+            "user": data.get("fullname"),
+            "message": feedback_text
+        }
+        response = requests.post(API_URL_FEEDBACK, json=payload)
+
+        if response.status_code == 201:
+            await message.answer("Izohingiz uchun rahmat!")
+        else:
+            await message.answer("Xatolik yuz berdi. Iltimos, keyinroq qayta urinib ko'ring.\n\t\t/start")
+
+        await state.finish()
 
 @dp.message_handler(lambda message: message.text == "Mahsulotlar")
 async def show_products(message: types.Message):
@@ -148,32 +213,26 @@ async def buy_product(call: types.CallbackQuery):
         else:
              await call.message.answer(f"Xatolik...\nIltimos botga qatadan /start buyruguni bosing!")
 
-@dp.message_handler(lambda message: message.text is not None and message.from_user.id)
-async def check_promocode(message: types.Message):
-    telegram_id = str(message.from_user.id)
-    promocode = message.text
-    payload = {
-        "telegram_id": telegram_id,
-        "promo_code": promocode
-    }
-    check_response = requests.post(API_URL_CHECK_ID, json={"telegram_id": telegram_id})
-    if check_response.status_code == 200:
-        data = check_response.json()
-        if data['exists']:
-            res = requests.post(API_URL_CHECK_PHONE, json={'phone': data['phone_number']})
-            if res.status_code == 200:
-                response = requests.post(API_URL_PROMOCODE, json=payload)
-                if response.status_code == 200:
-                    data = response.json()['data']
-                    await message.answer(f"Promokod muvaffaqiyatli qo'llandi:\nQo'shilgan ballar: {data.get('added_points')}\nUmumiy ballar: {data.get('total_points')}")
-                elif response.status_code == 400:
-                    await message.answer(f"{response.json()['message']}")
-                else:
-                    await message.answer(f"dsNoto`gri promocode")
-            elif requests.post(API_URL_CHECK_CODE, json={'promo_code': promocode}).status_code == 404:
-                await message.answer("Notogri Promocode")
-            else:
-                await message.answer("Sifatli Mahsulot ✅")
+@dp.message_handler(lambda message: message.text is not None)
+async def echo(message: types.Message):
+      # await message.answer("Kerakli buyruqni tanlang!")
+      telegram_id = str(message.from_user.id)
+      check_response = requests.post(API_URL_CHECK_ID, json={"telegram_id": telegram_id})
+      if check_response.status_code == 200:
+          data = check_response.json()
+          if data['exists']:
+              if data['is_registered']:
+                  markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+                  promocode_button = types.KeyboardButton("Promokod yuborish")
+                  products_button = types.KeyboardButton("Mahsulotlar")
+                  feedback_button = types.KeyboardButton("Izoh")
+                  res = requests.post(API_URL_CHECK_PHONE, json={'phone': data['phone_number']})
+                  if res.status_code == 200:
+                      markup.add(promocode_button, products_button, feedback_button)
+                      await message.answer("Iltimos, kerakli tugmani tanlang.", reply_markup=markup)
+                  else:
+                      markup.add(promocode_button)
+                      await message.answer("Iltimos, kerakli tugmani tanlang.", reply_markup=markup)
 
 
 if __name__ == "__main__":

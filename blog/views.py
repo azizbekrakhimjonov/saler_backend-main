@@ -81,7 +81,8 @@ class CheckTelegramIDView(APIView):
                 'exists': True,
                 'is_registered': user.is_registered,
                 'phone_number': user.phone_number,
-                'points': user.points
+                'points': user.points,
+                'fullname': user.fullname,
             }, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({'exists': False}, status=status.HTTP_200_OK)
