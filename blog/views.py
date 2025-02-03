@@ -171,21 +171,24 @@ class BuyProductView(View):
                 return JsonResponse({"error": "User not found."}, status=404)
 
             # Ballarni tekshirish
-            if user.points < product.points:
+            if user.points < product.price:  # `product.points` o'rniga `product.price`
                 return JsonResponse({"error": "Not enough points."}, status=400)
 
             # Ballarni kamaytirish va saqlash
-            user.points -= product.points
+            user.points -= product.price  # `product.points` o'rniga `product.price`
             user.save()
+
+            # **Purchase obyektini yaratish**
+            purchase = Purchase.objects.create(user=user, product=product)
 
             # Javob qaytarish
             return JsonResponse({
                 "message": "Product purchased successfully.",
                 "remaining_points": user.points,
-                "product": {
-                    "id": product.id,
-                    "name": product.name,
-                    "points": product.points,
+                "purchase": {
+                    "id": purchase.id,
+                    "product_name": product.name,
+                    "purchase_date": purchase.purchase_date.strftime('%Y-%m-%d %H:%M:%S'),
                 },
             }, status=200)
 
@@ -193,6 +196,7 @@ class BuyProductView(View):
             return JsonResponse({"error": "Invalid JSON format."}, status=400)
         except Exception as e:
             return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
+
 
 class FeedBackAPIView(APIView):
     def post(self, request):

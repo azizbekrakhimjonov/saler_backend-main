@@ -110,10 +110,9 @@ class Product(models.Model):
         return self.name
 
 class Purchase(models.Model):
-    user_id = models.CharField(max_length=255)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="purchases")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     purchase_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Purchase by {self.user_id} - {self.product.name} at {self.purchase_date}"
-
+        return f"Purchase by {self.user.fullname} - {self.product.name} at {self.purchase_date}"
