@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-6il9nezx&%iax7y=8o!8g2grgrkkn*isx$1z7htvi_=mj%2v6p
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost',  '.ngrok-free.app']
-CSRF_TRUSTED_ORIGINS = ['https://5f24-188-113-254-193.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://7f7f-188-113-194-180.ngrok-free.app']
 
 JAZZMIN_UI_TWEAKS = {
     "theme": "flatly",

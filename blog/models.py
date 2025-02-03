@@ -43,6 +43,7 @@ class Category(models.Model):
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")
 
+
 class Promocode(models.Model):
     code = models.CharField(max_length=6, unique=True, verbose_name=_("Promo Code"))
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name=_("Category"))
@@ -66,7 +67,7 @@ def create_promocodes(sender, instance, created, **kwargs):
     if created:  # Yangi kategoriya qo‘shilganda
         promocodes = []
         file_name = f"{instance.name}_promocodes.xlsx"
-        file_path = os.path.join("/var/www/softools.uz/media", "promocodes", file_name)
+        file_path = os.path.join("/var/www/hipad.uz/media", "promocodes", file_name)
 
         # Fayl saqlash uchun papka mavjudligini tekshirish
         os.makedirs(os.path.dirname(file_path), exist_ok=True)

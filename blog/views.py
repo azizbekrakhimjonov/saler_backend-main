@@ -6,7 +6,7 @@ from .serializers import *
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404, render
 import json
-
+from .models import User, Product, Purchase
 
 def home_view(request):
     return render(request, 'index.html')
@@ -28,7 +28,7 @@ class UsePromocodeAPIView(APIView):
             return Response(
                 {
                     "success": False,
-                    "message": f"Promo kod allaqachon ishlatilgan.\n"
+                    "message": f"Promokod allaqachon ishlatilgan.\n"
                                f"Ishlatgan: {promocode.used_by.fullname}, {promocode.used_by.phone_number}"
                 },
                 status=status.HTTP_400_BAD_REQUEST
@@ -146,6 +146,7 @@ class ProductListView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  # Xatolikni qaytarish
+
 
 class BuyProductView(View):
     def post(self, request):

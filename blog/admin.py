@@ -72,6 +72,8 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user_id', 'points')
+    list_display = ('id', 'name', 'points')
 
-admin.site.register(Purchase)
+@admin.register(Purchase)
+class PurchaseAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'product', 'purchase_date')
