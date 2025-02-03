@@ -5,7 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 import requests
 
-url = 'https://hipad.uz'
+url = ''
 # url = 'https://9640-188-113-231-246.ngrok-free.app'
 API_URL_CHECK_ID =  f"{url}/api/check_id/"
 API_URL_CHECK_PHONE =  f"{url}/api/phone/"
@@ -15,8 +15,8 @@ API_URL_REGISTER =  f"{url}/api/register/"
 API_URL_PROMOCODE = f"{url}/api/code/"
 API_URL_PRODUCTS =  f"{url}/api/products/"
 API_URL_BUY_PRODUCTS = f"{url}/api/buy_product/"
-TOKEN = "7451986125:AAEykGVq6ZNjnUaUZLc8TTof-TN8P8y77K4"
-# TOKEN = "7832802417:AAHd6atjmzCKdx4IgnOJLB7EIsvUrP9Mu7U"
+
+TOKEN = "7832802417:AAHd6atjmzCKdx4IgnOJLB7EIsvUrP9Mu7U"
 
 logging.basicConfig(level=logging.INFO)
 
