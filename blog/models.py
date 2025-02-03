@@ -43,7 +43,6 @@ class Category(models.Model):
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")
 
-
 class Promocode(models.Model):
     code = models.CharField(max_length=6, unique=True, verbose_name=_("Promo Code"))
     category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name=_("Category"))
@@ -111,5 +110,10 @@ class Product(models.Model):
         return self.name
 
 class Purchase(models.Model):
+    user_id = models.CharField(max_length=255)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    purchase_date = models.DateTimeField(auto_now=True)
+
     def __str__(self):
-        return "Purchase Model"
+        return f"Purchase by {self.user_id} - {self.product.name} at {self.purchase_date}"
+
