@@ -5,7 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 import requests
 
-url = 'https://hipad.uz'
+url = ''
 # url = 'https://9640-188-113-231-246.ngrok-free.app'
 API_URL_CHECK_ID =  f"{url}/api/check_id/"
 API_URL_CHECK_PHONE =  f"{url}/api/phone/"
