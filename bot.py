@@ -16,7 +16,7 @@ API_URL_PROMOCODE = f"{url}/api/code/"
 API_URL_PRODUCTS =  f"{url}/api/products/"
 API_URL_BUY_PRODUCTS = f"{url}/api/buy_product/"
 
-TOKEN = "7832802417:AAHd6atjmzCKdx4IgnOJLB7EIsvUrP9Mu7U"
+TOKEN = ""
 
 logging.basicConfig(level=logging.INFO)
 
