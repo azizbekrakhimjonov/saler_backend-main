@@ -34,5 +34,11 @@ class PhoneNumberSerializer(serializers.Serializer):
 class FeedBackSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeedBack
-        # fields = "__all__"
         fields = ['user', 'message']
+
+class PurchaseSerializer(serializers.ModelSerializer):
+    purchase_date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")  # Vaqt formatlash
+
+    class Meta:
+        model = Purchase
+        fields = ['user', 'product', 'purchase_date', 'status']
