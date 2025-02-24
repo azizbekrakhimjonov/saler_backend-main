@@ -47,7 +47,7 @@ class PromocodeAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'point', 'excel_file_link')  # Excel fayl uchun havola chiqariladi
+    list_display = ('name', 'point', 'count', 'excel_file_link')  # Excel fayl uchun havola chiqariladi
     readonly_fields = ('excel_file',)  # Excel fayl faqat o'qish rejimida bo'ladi
 
     def excel_file_link(self, obj):
@@ -60,7 +60,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(FeedBack)
 class FeedBackAdmin(admin.ModelAdmin):
-    list_display = ('user', 'message')
+    list_display = ('user', 'message', 'created_at')
 
 @admin.register(PhoneNumber)
 class PhoneNumberAdmin(admin.ModelAdmin):
@@ -74,6 +74,29 @@ class UserAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'points')
 
+
+from django.utils.html import format_html
+
 @admin.register(Purchase)
 class PurchaseAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'product', 'purchase_date')
+    list_display = ('id', 'user', 'product', 'purchase_date', 'status', 'user_address')
+    list_filter = ('status',)
+    actions = ['mark_accepted', 'mark_rejected']
+
+    def user_address(self, obj):
+        google_maps_link = f"https://www.google.com/maps/search/?api=1&query={obj.user.address}"
+        yandex_maps_link = f"https://yandex.com/maps/?text={obj.user.address}"
+
+        return format_html(
+            '{} <a href="{}" target="_blank">(Google Maps)</a> | <a href="{}" target="_blank">(Yandex Maps)</a>',
+            obj.user.address, google_maps_link, yandex_maps_link
+        )
+
+    def mark_as_accepted(self, request, queryset):
+        queryset.update(status='accepted')
+    mark_as_accepted.short_description = "Tanlangan buyurtmalarni qabul qilingan deb belgilash"
+
+    def mark_as_rejected(self, request, queryset):
+        queryset.update(status='rejected')
+    mark_as_rejected.short_description = "Tanlangan buyurtmalarni rad etilgan deb belgilash"
+
