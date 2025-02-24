@@ -8,6 +8,9 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
+from root import settings
+
+
 class User(models.Model):
     telegram_id = models.CharField(max_length=100, unique=True, verbose_name=_("Telegram ID"))
     fullname = models.CharField(max_length=255, verbose_name=_("Full Name"))
@@ -34,6 +37,7 @@ class PhoneNumber(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name=_("Category"))
     point = models.IntegerField(verbose_name=_("Points"))
+    count = models.IntegerField(default=1000, verbose_name=_("Promo Code Count"))  # Nechta promo-kod yaratish
     excel_file = models.FileField(upload_to='promocodes/', null=True, blank=True, verbose_name=_("Excel File"))
 
     def __str__(self):
@@ -62,37 +66,36 @@ class Promocode(models.Model):
         verbose_name = _("Promocode")
         verbose_name_plural = _("Promocodes")
 
+
 @receiver(post_save, sender=Category)
 def create_promocodes(sender, instance, created, **kwargs):
-    if created:  # Yangi kategoriya qo‘shilganda
+    if created:
         promocodes = []
         file_name = f"{instance.name}_promocodes.xlsx"
-        file_path = os.path.join("/var/www/hipad.uz/media", "promocodes", file_name)
+        # file_path = os.path.join("/var/www/hipad.uz/media", "promocodes", file_name)
+        file_path = os.path.join(settings.MEDIA_ROOT, "promocodes", file_name)
 
-        # Fayl saqlash uchun papka mavjudligini tekshirish
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-        # Excel fayl yaratish
         workbook = openpyxl.Workbook()
         sheet = workbook.active
         sheet.title = "Promocodes"
 
-        # Sarlavhalarni yozish
         sheet.append(["Promocode", "Category Name", "Points"])
 
-        for _ in range(1000):  # Har bir yangi kategoriya uchun 1000 ta Promocode generatsiya qilinadi
-            code = ''.join(choices(ascii_uppercase + digits, k=6))  # Promo kod yaratish
+        for _ in range(instance.count):  # `count` maydonidan foydalanamiz
+            code = ''.join(choices(ascii_uppercase + digits, k=6))
             promocodes.append(
                 Promocode(code=code, category=instance, point=instance.point)
             )
-            sheet.append([code, instance.name, instance.point])  # Excelga yozish
+            sheet.append([code, instance.name, instance.point])
 
-        Promocode.objects.bulk_create(promocodes)  # Promocodlarni saqlash
-        workbook.save(file_path)  # Excel faylni saqlash
+        Promocode.objects.bulk_create(promocodes)
+        workbook.save(file_path)
 
-        # Excel faylni modelga bog‘lash
         instance.excel_file = f'promocodes/{file_name}'
         instance.save()
+
 
 class FeedBack(models.Model):
     user = models.CharField(max_length=100)
@@ -110,10 +113,18 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+
 class Purchase(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="purchases")
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    purchase_date = models.DateTimeField(auto_now=True)
+    purchase_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
 
     def __str__(self):
-        return f"Purchase by {self.user.fullname} - {self.product.name} at {self.purchase_date}"
+        return f"Purchase by {self.user.fullname} - {self.product.name} at {self.purchase_date} - {self.status}"
