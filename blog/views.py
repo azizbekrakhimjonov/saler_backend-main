@@ -11,7 +11,6 @@ from .models import User, Product, Purchase
 def home_view(request):
     return render(request, 'index.html')
 
-
 class UsePromocodeAPIView(APIView):
     def post(self, request, *args, **kwargs):
         user_id = request.data.get("telegram_id")
@@ -147,7 +146,6 @@ class ProductListView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  # Xatolikni qaytarish
 
-
 class BuyProductView(View):
     def post(self, request):
         try:
@@ -172,11 +170,11 @@ class BuyProductView(View):
                 return JsonResponse({"error": "User not found."}, status=404)
 
             # Ballarni tekshirish
-            if user.points < product.price:  # `product.points` o'rniga `product.price`
+            if user.points < product.points:
                 return JsonResponse({"error": "Not enough points."}, status=400)
 
             # Ballarni kamaytirish va saqlash
-            user.points -= product.price  # `product.points` o'rniga `product.price`
+            user.points -= product.points
             user.save()
 
             # **Purchase obyektini yaratish**
@@ -198,7 +196,6 @@ class BuyProductView(View):
         except Exception as e:
             return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
 
-
 class FeedBackAPIView(APIView):
     def post(self, request):
         serializer = FeedBackSerializer(data=request.data)
@@ -208,3 +205,49 @@ class FeedBackAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class PurchaseAPIView(APIView):
+    def get(self, request):
+        telegram_id = request.GET.get('telegram_id')
+        try:
+            if not telegram_id:
+                return Response({'error': 'Telegram ID kiritilishi shart'}, status=status.HTTP_400_BAD_REQUEST)
+            user = User.objects.filter(telegram_id=telegram_id).first()
+            if not user:
+                return Response({'error': 'Bunday foydalanuvchi topilmadi'}, status=status.HTTP_404_NOT_FOUND)
+            purchases = Purchase.objects.filter(user=user)
+            if not purchases.exists():
+                return Response({'message': 'Bu foydalanuvchi hech narsa sotib olmagan'}, status=status.HTTP_200_OK)
+            data = [
+                {
+                    "product_name": purchase.product.name,
+                    "product_image": request.build_absolute_uri(purchase.product.image.url) if purchase.product.image else None,
+                    "purchase_date": purchase.purchase_date.strftime("%Y-%m-%d %H:%M"),
+                    "status": purchase.status,
+                }
+                for purchase in purchases
+            ]
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class UpdatePurchaseStatusAPIView(APIView):
+    def post(self, request):
+        telegram_id = request.data.get('telegram_id')
+        product_name = request.data.get('product_name')
+        new_status = request.data.get('status')  # old status o‘zgaruvchisini new_status deb o‘zgartirdik
+
+        if not telegram_id or not product_name or new_status not in ['accepted', 'rejected']:
+            return Response({'error': 'Maʼlumotlar to‘liq emas yoki noto‘g‘ri'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.filter(telegram_id=telegram_id).first()
+        if not user:
+            return Response({'error': 'Foydalanuvchi topilmadi'}, status=status.HTTP_404_NOT_FOUND)
+
+        purchase = Purchase.objects.filter(user=user, product__name=product_name).first()
+        if not purchase:
+            return Response({'error': 'Buyurtma topilmadi'}, status=status.HTTP_404_NOT_FOUND)
+
+        purchase.status = new_status
+        purchase.save()
+
+        return Response({'message': f'Buyurtma {new_status} statusiga o‘zgartirildi'}, status=status.HTTP_200_OK)
