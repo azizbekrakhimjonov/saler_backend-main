@@ -14,6 +14,8 @@ urlpatterns = [
     path('products/', ProductListView.as_view(), name='product-list'),
     path('check_id/', CheckTelegramIDView.as_view(), name='check_telegram_id'),
     path('check_code/', CheckPromocodeAPIView.as_view(), name='check_code'),
+    path('purchase/', PurchaseAPIView.as_view(), name='purchase_id'),
+    path('purchase_update/', UpdatePurchaseStatusAPIView.as_view(), name='purchase_update'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
