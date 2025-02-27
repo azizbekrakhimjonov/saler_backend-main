@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.http import HttpResponse
 from django.contrib import admin
-from .models import User, Product, Purchase, FeedBack, PhoneNumber, Promocode, Category
+from .models import User, Product, Purchase, FeedBack, PhoneNumber, Promocode, Category, Comment
 import openpyxl
 from django.utils.html import format_html
 
@@ -100,3 +100,6 @@ class PurchaseAdmin(admin.ModelAdmin):
         queryset.update(status='rejected')
     mark_as_rejected.short_description = "Tanlangan buyurtmalarni rad etilgan deb belgilash"
 
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'message', 'created_at')

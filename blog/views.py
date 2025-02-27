@@ -6,7 +6,7 @@ from .serializers import *
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404, render
 import json
-from .models import User, Product, Purchase
+from .models import User, Product, Purchase, Comment
 
 def home_view(request):
     return render(request, 'index.html')
@@ -205,6 +205,7 @@ class FeedBackAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class PurchaseAPIView(APIView):
     def get(self, request):
         telegram_id = request.GET.get('telegram_id')
@@ -251,3 +252,11 @@ class UpdatePurchaseStatusAPIView(APIView):
         purchase.save()
 
         return Response({'message': f'Buyurtma {new_status} statusiga o‘zgartirildi'}, status=status.HTTP_200_OK)
+
+
+class CommentAPIView(APIView):
+    def get(self, request):
+        comments = Comment.objects.all()
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+

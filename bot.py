@@ -11,8 +11,8 @@ import os
 import pandas as pd
 
 
-url = ''
-# url = 'https://30ab-84-54-83-43.ngrok-free.app'
+# url = ''
+url = 'https://8691-84-54-83-43.ngrok-free.app'
 API_URL_CHECK_ID = f"{url}/api/check_id/"
 API_URL_CHECK_PHONE = f"{url}/api/phone/"
 API_URL_CHECK_CODE = f"{url}/api/check_code/"
@@ -23,8 +23,9 @@ API_URL_PRODUCTS = f"{url}/api/products/"
 API_URL_BUY_PRODUCTS = f"{url}/api/buy_product/"
 API_URL_PURCHASE = f"{url}/api/purchase/"
 API_URL_PURCHASE_UPDATE = f"{url}/api/purchase_update/"
+API_URL_STATUS = f"{url}/api/status/"
 
-TOKEN = ""
+TOKEN = "7832802417:AAHd6atjmzCKdx4IgnOJLB7EIsvUrP9Mu7U"
 
 logging.basicConfig(level=logging.INFO)
 
@@ -63,9 +64,10 @@ async def start(message: types.Message):
                 products_button = types.KeyboardButton("Mahsulotlar")
                 feedback_button = types.KeyboardButton("Izoh")
                 order_button = types.KeyboardButton("Buyurtmalar Tarixi")
+                status_button = types.KeyboardButton("Ballar")
                 res = requests.post(API_URL_CHECK_PHONE, json={'phone': data['phone_number']})
                 if res.status_code == 200:
-                    markup.add(promocode_button, products_button, feedback_button, order_button)
+                    markup.add(promocode_button, products_button, feedback_button, order_button, status_button)
                     await message.answer("Iltimos, kerakli tugmani tanlang:", reply_markup=markup)
                 else:
                     markup.add(promocode_button)
@@ -165,6 +167,16 @@ async def confirm_address(message: types.Message, state: FSMContext):
 
     await state.finish()
 
+@dp.message_handler(lambda message: message.text == "Ballar")
+async def show_points(message: types.Message):
+    response = requests.get(API_URL_STATUS)
+    if response.status_code == 200 and len(response.json()) != 0:
+        await message.answer(f"{response.json()[0]['message']}")
+    else:
+        await message.answer("Malumot yo`q.")
+
+
+
 
 @dp.message_handler(lambda message: message.text == "Promokod yuborish")
 async def promocode_start(message: types.Message):
@@ -200,33 +212,6 @@ async def check_promocode(message: types.Message, state: FSMContext):
             else:
                 await message.answer("✅Siz siftali maxsulot xarid qildingiz")
     await state.finish()
-
-
-# @dp.message_handler(lambda message: message.text == "Buyurtmalar Tarixi")
-# async def orders(message: types.Message):
-#     telegram_id = message.from_user.id
-#     check_response = requests.post(API_URL_CHECK_ID, json={"telegram_id": str(telegram_id)})
-#     if check_response.status_code == 200:
-#         response = requests.get(API_URL_PURCHASE, params={"telegram_id": telegram_id})
-#         if response.status_code == 200:
-#             data = response.json()
-#             if isinstance(data, dict) and "message" in data:
-#                 await message.answer("📦 Buyurtmalar topilmadi!")
-#             else:
-#                 for item in data:
-#                     product_name = item.get("product_name", "Noma'lum mahsulot")
-#                     product_image = item.get("product_image", None)
-#                     purchase_date = item.get("purchase_date", "Sana mavjud emas")
-#
-#                     text = f"🛒 *Mahsulot*: {product_name}\n📅 *Sana*: {purchase_date}"
-#
-#                     if product_image:
-#                         await bot.send_photo(message.chat.id, photo=product_image, caption=text,
-#                                              parse_mode="Markdown")
-#                     else:
-#                         await message.answer(text, parse_mode="Markdown")
-#         else:
-#             await message.answer("❌ Ma'lumotlarni olishda xatolik yuz berdi. Keyinroq urinib ko'ring!")
 
 @dp.message_handler(lambda message: message.text == "Buyurtmalar Tarixi")
 async def orders(message: types.Message):
@@ -311,7 +296,6 @@ async def process_feedback(message: types.Message, state: FSMContext):
             "message": feedback_text
         }
         response = requests.post(API_URL_FEEDBACK, json=payload)
-        # await message.answer(f'{check_response.status_code}')
         if response.status_code == 201:
             await message.answer("Izohingiz uchun rahmat!")
         else:
@@ -378,9 +362,11 @@ async def echo(message: types.Message):
                 products_button = types.KeyboardButton("Mahsulotlar")
                 feedback_button = types.KeyboardButton("Izoh")
                 order_button = types.KeyboardButton("Buyurtmalar Tarixi")
+                status_button = types.KeyboardButton("Ballar")
                 res = requests.post(API_URL_CHECK_PHONE, json={'phone': data['phone_number']})
                 if res.status_code == 200:
-                    markup.add(promocode_button, products_button, feedback_button, order_button)
+                    markup.add(promocode_button, products_button, feedback_button, order_button, status_button)
+
                     await message.answer("Iltimos, kerakli tugmani tanlang:", reply_markup=markup)
                 else:
                     markup.add(promocode_button)

@@ -16,6 +16,7 @@ urlpatterns = [
     path('check_code/', CheckPromocodeAPIView.as_view(), name='check_code'),
     path('purchase/', PurchaseAPIView.as_view(), name='purchase_id'),
     path('purchase_update/', UpdatePurchaseStatusAPIView.as_view(), name='purchase_update'),
+    path('status/', CommentAPIView.as_view(), name='status'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

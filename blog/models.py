@@ -128,3 +128,10 @@ class Purchase(models.Model):
 
     def __str__(self):
         return f"Purchase by {self.user.fullname} - {self.product.name} at {self.purchase_date} - {self.status}"
+
+class Comment(models.Model):
+    message = models.TextField(default=None)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.created_at}"
