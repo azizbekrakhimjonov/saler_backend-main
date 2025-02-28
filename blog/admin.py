@@ -60,7 +60,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(FeedBack)
 class FeedBackAdmin(admin.ModelAdmin):
-    list_display = ('user', 'message', 'created_at')
+    list_display = ('user', 'message', 'phone', 'created_at')
 
 @admin.register(PhoneNumber)
 class PhoneNumberAdmin(admin.ModelAdmin):
@@ -68,6 +68,7 @@ class PhoneNumberAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
+    readonly_fields = ('points',)
     list_display = ('id', 'telegram_id', 'fullname', 'phone_number', 'points')
 
 @admin.register(Product)

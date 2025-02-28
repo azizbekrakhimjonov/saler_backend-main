@@ -12,7 +12,7 @@ import pandas as pd
 
 
 # url = ''
-url = 'https://8691-84-54-83-43.ngrok-free.app'
+url = 'https://2698-188-113-221-138.ngrok-free.app'
 API_URL_CHECK_ID = f"{url}/api/check_id/"
 API_URL_CHECK_PHONE = f"{url}/api/phone/"
 API_URL_CHECK_CODE = f"{url}/api/check_code/"
@@ -293,7 +293,8 @@ async def process_feedback(message: types.Message, state: FSMContext):
         data = check_response.json()
         payload = {
             "user": data.get("fullname"),
-            "message": feedback_text
+            "message": feedback_text,
+            'phone': data.get("phone_number")
         }
         response = requests.post(API_URL_FEEDBACK, json=payload)
         if response.status_code == 201:
