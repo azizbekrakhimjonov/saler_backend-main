@@ -5,6 +5,8 @@ from django.contrib import admin
 from .models import User, Product, Purchase, FeedBack, PhoneNumber, Promocode, Category, Comment
 import openpyxl
 from django.utils.html import format_html
+from django.utils.html import format_html
+
 
 @receiver(post_save, sender=Category)
 def update_promocode_points(sender, instance, **kwargs):
@@ -12,6 +14,7 @@ def update_promocode_points(sender, instance, **kwargs):
 
 @admin.register(Promocode)
 class PromocodeAdmin(admin.ModelAdmin):
+    readonly_fields = ('code', 'category', 'point', 'used_by')
     list_display = ('code', 'category', 'point', 'used_by')
     list_filter = ('category',)
     search_fields = ('code', )
@@ -68,7 +71,7 @@ class PhoneNumberAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    readonly_fields = ('points',)
+    readonly_fields = ('points', 'fullname', 'phone_number', 'telegram_id', 'address', 'is_registered')
     list_display = ('id', 'telegram_id', 'fullname', 'phone_number', 'points')
 
 @admin.register(Product)
