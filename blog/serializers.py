@@ -34,6 +34,7 @@ class PhoneNumberSerializer(serializers.Serializer):
 class FeedBackSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeedBack
+        # fields = "__all__"
         fields = ['user', 'message', 'phone']
 
 class PurchaseSerializer(serializers.ModelSerializer):

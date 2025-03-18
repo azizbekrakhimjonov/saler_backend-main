@@ -8,9 +8,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
-from root import settings
-
-
 class User(models.Model):
     telegram_id = models.CharField(max_length=100, unique=True, verbose_name=_("Telegram ID"))
     fullname = models.CharField(max_length=255, verbose_name=_("Full Name"))
@@ -37,7 +34,7 @@ class PhoneNumber(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name=_("Category"))
     point = models.IntegerField(verbose_name=_("Points"))
-    count = models.IntegerField(default=1000, verbose_name=_("Promo Code Count"))  # Nechta promo-kod yaratish
+    count = models.IntegerField(default=1000, verbose_name=_("Promo Code Count"))
     excel_file = models.FileField(upload_to='promocodes/', null=True, blank=True, verbose_name=_("Excel File"))
 
     def __str__(self):
@@ -72,8 +69,8 @@ def create_promocodes(sender, instance, created, **kwargs):
     if created:
         promocodes = []
         file_name = f"{instance.name}_promocodes.xlsx"
-        # file_path = os.path.join("/var/www/hipad.uz/media", "promocodes", file_name)
-        file_path = os.path.join(settings.MEDIA_ROOT, "promocodes", file_name)
+        file_path = os.path.join("/var/www/hipad.uz/media", "promocodes", file_name)
+        # file_path = os.path.join(settings.MEDIA_ROOT, "promocodes", file_name)
 
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 

@@ -205,7 +205,6 @@ class FeedBackAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class PurchaseAPIView(APIView):
     def get(self, request):
         telegram_id = request.GET.get('telegram_id')
