@@ -30,8 +30,8 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost',  '.ngrok-free.app']
 CSRF_TRUSTED_ORIGINS = ['https://8691-84-54-83-43.ngrok-free.app']
 
 JAZZMIN_UI_TWEAKS = {
-    "theme": "flatly",
-    "dark_mode_theme": "darkly",
+    "theme": "darkly",
+    # "dark_mode_theme": "darkly",
 }
 
 
