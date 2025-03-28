@@ -83,7 +83,7 @@ from django.utils.html import format_html
 
 @admin.register(Purchase)
 class PurchaseAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'product', 'purchase_date', 'status', 'user_address')
+    list_display = ('id', 'user', 'product', 'user_phone', 'purchase_date', 'status', 'user_address')
     list_filter = ('status',)
     actions = ['mark_accepted', 'mark_rejected']
 
@@ -95,6 +95,10 @@ class PurchaseAdmin(admin.ModelAdmin):
             '{} <a href="{}" target="_blank">(Google Maps)</a> | <a href="{}" target="_blank">(Yandex Maps)</a>',
             obj.user.address, google_maps_link, yandex_maps_link
         )
+
+    def user_phone(self, obj):
+        return obj.user.phone_number
+    user_phone.short_description = "User Phone"
 
     def mark_as_accepted(self, request, queryset):
         queryset.update(status='accepted')
